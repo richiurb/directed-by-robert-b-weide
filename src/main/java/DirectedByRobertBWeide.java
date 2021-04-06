@@ -1,6 +1,8 @@
 import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
@@ -9,8 +11,9 @@ public class DirectedByRobertBWeide {
 
     private final Image img;
     private final AudioInputStream stream;
+    private JFrame frame;
 
-    private DirectedByRobertBWeide() throws URISyntaxException, IOException, UnsupportedAudioFileException {
+    public DirectedByRobertBWeide() throws URISyntaxException, IOException, UnsupportedAudioFileException {
         img = Toolkit.getDefaultToolkit().createImage(DirectedByRobertBWeide.class.getResource("out.gif").toURI().toURL());
         stream = AudioSystem.getAudioInputStream(Paths.get(DirectedByRobertBWeide.class.getResource("file.wav").toURI()).toFile());
     }
@@ -23,10 +26,16 @@ public class DirectedByRobertBWeide {
         gainControl.setValue(-10.0f);
         audioClip.start();
         audioClip.loop(loops);
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                audioClip.stop();
+            }
+        });
     }
 
     private void showMeme(Image img, Dimension dimension) {
-        JFrame frame = new JFrame("Directed by Robert B. Weide");
+        frame = new JFrame("Directed by Robert B. Weide");
         frame.setPreferredSize(dimension);
         frame.add(new ImagePanel(img));
         frame.setResizable(false);
@@ -37,8 +46,8 @@ public class DirectedByRobertBWeide {
     }
 
     public void start() throws LineUnavailableException, IOException {
-        playSound(Clip.LOOP_CONTINUOUSLY);
         showMeme(img, new Dimension(520, 293));
+        playSound(Clip.LOOP_CONTINUOUSLY);
     }
 
     public static void main(String[] args) throws UnsupportedAudioFileException, IOException,
